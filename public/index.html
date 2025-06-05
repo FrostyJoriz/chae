@@ -2,70 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roblox Cookie Refresher</title>
   <style>
     body {
-      background-color: #0d1117;
-      color: #c9d1d9;
       font-family: Arial, sans-serif;
-      padding: 20px;
-      text-align: center;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2em;
     }
 
     h1 {
-      color: #58a6ff;
+      color: #4aa4ff;
     }
 
-    textarea, input {
+    input, textarea, button {
+      margin: 0.5em;
+      padding: 0.5em;
       width: 90%;
-      max-width: 600px;
-      margin: 10px auto;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #30363d;
-      background-color: #161b22;
-      color: #c9d1d9;
+      max-width: 500px;
     }
 
     button {
-      background-color: #238636;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin: 10px 5px;
-      border-radius: 5px;
       cursor: pointer;
+    }
+
+    #error {
+      color: red;
       font-weight: bold;
-    }
-
-    button:hover {
-      background-color: #2ea043;
-    }
-
-    #message {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    #output {
-      height: 40px;
     }
   </style>
 </head>
 <body>
-  <h1>🔁 Roblox Cookie Refresher</h1>
+  <h1>🔐 Roblox Cookie Refresher</h1>
 
-  <input id="cookieInput" type="text" placeholder="Enter your .ROBLOSECURITY cookie" />
+  <input type="text" id="cookieInput" placeholder="Enter your .ROBLOSECURITY cookie" />
+  <button onclick="refreshCookie()">Refresh Cookie</button>
+  <button onclick="copyToClipboard()">Copy</button>
 
-  <div>
-    <button id="refreshBtn">Refresh Cookie</button>
-    <button id="copyBtn">Copy</button>
-  </div>
+  <textarea id="result" rows="5" readonly placeholder="Refreshed cookie will appear here..."></textarea>
 
-  <textarea id="output" placeholder="Refreshed cookie will appear here..." readonly></textarea>
-
-  <div id="message"></div>
+  <p id="error"></p>
 
   <script src="script.js"></script>
 </body>
