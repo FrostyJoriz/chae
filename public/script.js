@@ -14,7 +14,7 @@ refreshBtn.addEventListener("click", async () => {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/refresh?cookie=${encodeURIComponent(rawCookie)}`);
+    const response = await fetch(`/refresh?cookie=${encodeURIComponent(rawCookie)}`);
     const data = await response.json();
 
     if (data.cookie) {
