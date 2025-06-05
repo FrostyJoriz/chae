@@ -3,7 +3,7 @@ const cors = require('cors');
 const axios = require('axios');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.static('public'));
@@ -73,9 +73,7 @@ async function refreshCookie(rawCookie) {
       return { error: 'Could not parse refreshed cookie.' };
     }
 
-    // ✅ Return raw extracted cookie only, no added "_|"
-    return { cookie: extracted[1] };
-
+    return { cookie: extracted[1] }; // ✅ No prefix
   } catch (error) {
     return { error: error.message || 'Unknown error occurred.' };
   }
