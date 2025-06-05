@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roblox Cookie Refresher</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #1e1e1e;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 1rem;
+      font-family: monospace;
+    }
+
+    button {
+      background-color: #6d5dfc;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+
+    button:hover {
+      background-color: #5747e2;
+    }
+
+    #message {
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔐 Roblox Cookie Refresher</h2>
+    <input id="cookieInput" placeholder="Enter your ROBLOX cookie" />
+    <button id="refreshBtn">Refresh Cookie</button>
+    <textarea id="output" rows="6" readonly placeholder="Refreshed cookie will appear here"></textarea>
+    <button id="copyBtn">📋 Copy to Clipboard</button>
+    <div id="message"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
