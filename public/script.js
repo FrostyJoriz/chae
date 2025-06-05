@@ -1,42 +1,28 @@
-const inputField = document.getElementById("cookieInput");
-const outputArea = document.getElementById("output");
-const copyBtn = document.getElementById("copyBtn");
-const refreshBtn = document.getElementById("refreshBtn");
-const message = document.getElementById("message");
+async function refreshCookie() {
+  const input = document.getElementById('cookieInput').value.trim();
+  const resultBox = document.getElementById('result');
+  const errorBox = document.getElementById('error');
 
-refreshBtn.addEventListener("click", async () => {
-  const rawCookie = inputField.value.trim();
-
-  if (!rawCookie) {
-    message.textContent = "❌ Please enter a cookie.";
-    message.style.color = "red";
-    return;
-  }
+  resultBox.value = '';
+  errorBox.textContent = '';
 
   try {
-    const response = await fetch(`/refresh?cookie=${encodeURIComponent(rawCookie)}`);
-    const data = await response.json();
+    const res = await fetch(`https://chaebol.onrender.com/refresh?cookie=${encodeURIComponent(input)}`);
+    const data = await res.json();
 
     if (data.cookie) {
-      outputArea.value = data.cookie;
-      message.textContent = "✅ Cookie refreshed successfully.";
-      message.style.color = "limegreen";
+      resultBox.value = data.cookie;
     } else {
-      throw new Error(data.error || "Unknown error");
+      errorBox.textContent = `❌ ${data.error || 'Failed to refresh cookie.'}`;
     }
   } catch (err) {
-    outputArea.value = "";
-    message.textContent = "❌ " + err.message;
-    message.style.color = "red";
+    errorBox.textContent = `❌ Request failed with status code ${err?.status || 401}`;
   }
-});
+}
 
-copyBtn.addEventListener("click", () => {
-  if (!outputArea.value) return;
-
-  outputArea.select();
-  document.execCommand("copy");
-
-  message.textContent = "📋 Copied to clipboard.";
-  message.style.color = "blueviolet";
-});
+function copyToClipboard() {
+  const text = document.getElementById('result').value;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Copied to clipboard!');
+  });
+}
