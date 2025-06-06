@@ -1,40 +1,42 @@
-document.getElementById("refreshBtn").addEventListener("click", async () => {
-  const input = document.getElementById("cookieInput").value.trim();
+const inputField = document.getElementById("cookieInput");
+const outputArea = document.getElementById("output");
+const copyBtn = document.getElementById("copyBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+const message = document.getElementById("message");
 
-  if (!input) {
-    showStatus("Please enter a cookie first.", true);
+refreshBtn.addEventListener("click", async () => {
+  const rawCookie = inputField.value.trim();
+
+  if (!rawCookie) {
+    message.textContent = "❌ Please enter a cookie.";
+    message.style.color = "red";
     return;
   }
 
   try {
-    const response = await fetch(`/refresh?cookie=${encodeURIComponent(input)}`);
-    const data = await response.text();
+    const response = await fetch(`/refresh?cookie=${encodeURIComponent(rawCookie)}`);
+    const data = await response.json();
 
-    if (!response.ok) {
-      showStatus(`❌ Request failed with status code ${response.status}`, true);
-      return;
+    if (data.cookie) {
+      outputArea.value = data.cookie; // ✅ use only the raw cookie
+      message.textContent = "✅ Cookie refreshed successfully.";
+      message.style.color = "limegreen";
+    } else {
+      throw new Error(data.error || "Unknown error");
     }
-
-    // Ensure the output has exactly one _| prefix
-    const cleaned = data.replace(/^(_\|)+/, ""); // remove any existing _|
-    const result = "_|".concat(cleaned);         // add only one _|
-
-    document.getElementById("output").value = result;
-    showStatus("✅ Cookie refreshed successfully!");
   } catch (err) {
-    showStatus(`❌ Error: ${err.message}`, true);
+    outputArea.value = "";
+    message.textContent = "❌ " + err.message;
+    message.style.color = "red";
   }
 });
 
-document.getElementById("copyBtn").addEventListener("click", () => {
-  const output = document.getElementById("output");
-  output.select();
-  document.execCommand("copy");
-  showStatus("✅ Copied to clipboard!");
-});
+copyBtn.addEventListener("click", () => {
+  if (!outputArea.value) return;
 
-function showStatus(msg, isError = false) {
-  const el = document.getElementById("statusText");
-  el.textContent = msg;
-  el.style.color = isError ? "red" : "lime";
-}
+  outputArea.select();
+  document.execCommand("copy");
+
+  message.textContent = "📋 Copied to clipboard.";
+  message.style.color = "blueviolet";
+});
