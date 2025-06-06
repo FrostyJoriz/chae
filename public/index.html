@@ -6,69 +6,37 @@
   <title>Roblox Cookie Refresher</title>
   <style>
     body {
-      background-color: #0f1115;
-      color: #e6e6e6;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px;
-    }
-
-    h1 {
-      color: #4ea7ff;
-    }
-
-    input, textarea {
-      width: 90%;
-      max-width: 600px;
-      margin: 10px 0;
-      padding: 10px;
-      border: none;
-      border-radius: 4px;
-      font-size: 14px;
-      background-color: #1e1e1e;
+      font-family: sans-serif;
+      background-color: #0f1117;
       color: white;
+      text-align: center;
+      padding: 2rem;
     }
-
-    button {
-      width: 90%;
-      max-width: 600px;
-      margin: 6px 0;
-      padding: 10px;
-      font-size: 16px;
+    input, textarea, button {
+      display: block;
+      margin: 1rem auto;
+      width: 80%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
       border: none;
-      border-radius: 4px;
-      background-color: #ddd;
+    }
+    button {
+      background-color: #e0e0e0;
       cursor: pointer;
     }
-
-    button:hover {
-      background-color: #ccc;
-    }
-
     #statusText {
-      margin-top: 10px;
-      color: red;
+      margin-top: 1rem;
       font-weight: bold;
-    }
-
-    textarea {
-      height: 120px;
-      resize: vertical;
     }
   </style>
 </head>
 <body>
   <h1>🔐 Roblox Cookie Refresher</h1>
-
-  <input id="cookieInput" placeholder="_|WARNING:-DO-NOT-SHARE-THIS..." />
-
+  <input id="cookieInput" placeholder="Enter your .ROBLOSECURITY cookie here">
   <button id="refreshBtn">Refresh Cookie</button>
   <button id="copyBtn">Copy</button>
-
-  <textarea id="output" readonly placeholder="Refreshed cookie will appear here..."></textarea>
-
+  <textarea id="output" placeholder="Refreshed cookie will appear here..." rows="4" readonly></textarea>
   <div id="statusText"></div>
 
   <script src="script.js"></script>
