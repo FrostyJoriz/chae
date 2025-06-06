@@ -1,60 +1,84 @@
 const express = require('express');
 const cors = require('cors');
-const https = require('https');
+const axios = require('axios');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
 app.use(express.static('public'));
 
-app.get('/refresh', (req, res) => {
-  const inputCookie = req.query.cookie;
+function getCSRFToken(cookie) {
+  return axios.post('https://auth.roblox.com/v2/login', {}, {
+    headers: {
+      'Cookie': `.ROBLOSECURITY=${cookie}`
+    }
+  }).catch(error => {
+    const token = error.response?.headers['x-csrf-token'];
+    if (!token) throw new Error('Failed to get CSRF token.');
+    return token;
+  });
+}
 
-  if (!inputCookie || !inputCookie.includes('.ROBLOSECURITY')) {
-    return res.status(400).json({ error: 'Invalid cookie format.' });
+async function refreshCookie(rawCookie) {
+  if (!rawCookie) return { error: 'No cookie provided.' };
+
+  const cookie = rawCookie.replace(/\s/g, '');
+  if (!cookie.includes('_|') && !cookie.startsWith('.ROBLOSECURITY=')) {
+    return { error: 'Invalid or missing cookie format.' };
   }
 
-  const options = {
-    hostname: 'auth.roblox.com',
-    path: '/v2/logout',
-    method: 'POST',
-    headers: {
-      'Cookie': `.ROBLOSECURITY=${inputCookie}`,
-      'User-Agent': 'Roblox/WinInet',
-    }
-  };
+  try {
+    const csrfToken = await getCSRFToken(cookie);
 
-  const request = https.request(options, (response) => {
-    const newCookieLine = response.headers['set-cookie']?.find(c => c.includes('.ROBLOSECURITY'));
-    if (!newCookieLine) {
-      return res.status(401).json({ error: 'Cookie refresh failed (no Set-Cookie).' });
-    }
+    const ticketRes = await axios.post('https://auth.roblox.com/v1/authentication-ticket', {}, {
+      headers: {
+        'Cookie': `.ROBLOSECURITY=${cookie}`,
+        'x-csrf-token': csrfToken,
+        'Referer': 'https://www.roblox.com',
+        'Origin': 'https://www.roblox.com'
+      }
+    });
+
+    const ticket = ticketRes.headers['rbx-authentication-ticket'];
+    if (!ticket) return { error: 'Failed to retrieve authentication ticket.' };
+
+    const finalRes = await axios.post('https://auth.roblox.com/v1/authentication-ticket/redeem', {
+      authenticationTicket: ticket
+    }, {
+      headers: {
+        'x-csrf-token': csrfToken,
+        'Referer': 'https://www.roblox.com',
+        'Origin': 'https://www.roblox.com',
+        'Content-Type': 'application/json',
+        'RBXAuthenticationNegotiation': '1'
+      },
+      withCredentials: true
+    });
+
+    const setCookie = finalRes.headers['set-cookie'] || [];
+    const newCookieLine = setCookie.find(c => c.includes('.ROBLOSECURITY='));
+    if (!newCookieLine) return { error: 'Failed to extract new cookie from response.' };
 
     const extracted = newCookieLine.match(/\.ROBLOSECURITY=([^;]+)/);
-    if (!extracted || !extracted[1]) {
-      return res.status(401).json({ error: 'Failed to parse refreshed cookie.' });
-    }
+    if (!extracted) return { error: 'Could not parse refreshed cookie.' };
 
-    let refreshed = extracted[1].trim();
-    if (refreshed.startsWith('_|') || refreshed.startsWith('_||_')) {
-      refreshed = refreshed.replace(/^(_\|)+/, '_|'); // Clean to exactly one _|
-    } else {
-      refreshed = '_|' + refreshed;
-    }
+    const refreshed = extracted[1].startsWith('_|')
+      ? extracted[1]
+      : '_|' + extracted[1];
 
-    return res.json({ cookie: refreshed });
-  });
+    return { cookie: refreshed };
+  } catch (error) {
+    return { error: error.message || 'Unknown error occurred.' };
+  }
+}
 
-  request.on('error', (err) => {
-    console.error('HTTPS error:', err);
-    return res.status(500).json({ error: 'Server error during refresh.' });
-  });
-
-  request.end();
+app.get('/refresh', async (req, res) => {
+  const input = req.query.cookie || '';
+  const result = await refreshCookie(input);
+  res.json(result);
 });
 
 app.listen(port, () => {
-  console.log(`✅ Server running at http://localhost:${port}`);
+  console.log(`🚀 Server running at http://localhost:${port}`);
 });
